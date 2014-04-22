@@ -4,6 +4,11 @@ import java.io.File;
 
 import android.content.Context;
 
+/**
+ * /data/data下的文件管理，该实现是将所有的文件下载到应用路径的files下
+ * 
+ * @author Yin Yong
+ */
 class DataFileManager extends FileManager {
 
 	private File mRootDirPath;
@@ -12,7 +17,7 @@ class DataFileManager extends FileManager {
 	}
 	
 	@Override
-	public File getRootDirPath() {
+	public synchronized File getRootDirPath() {
 		if (null == mRootDirPath) {
 			mRootDirPath = getContext().getFilesDir();
 		}

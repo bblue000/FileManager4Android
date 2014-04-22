@@ -2,11 +2,10 @@ package org.ixming.android.file;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.ixming.android.coding.MD5;
-import org.ixming.simple.SimpleInstancePool;
-import org.ixming.simple.SimplePoolControl;
 
 /**
  * FileManager机制中，组合File Name/Path的工具类
@@ -16,22 +15,30 @@ import org.ixming.simple.SimplePoolControl;
 public class FileNameCompositor {
 
 	private static final int MAX_POOL_SIZE = 3;
-	private static final SimpleInstancePool<FileNameCompositor> sPool
-		= new SimpleInstancePool<FileNameCompositor>(MAX_POOL_SIZE,
-				new SimplePoolControl<FileNameCompositor>() {
-			public FileNameCompositor createInstance(Object...args) {
-				return new FileNameCompositor();
-			};
-			
-			public void recycleInstance(FileNameCompositor e) {
-				if (null != e) {
-					e.empty();
-				}
-			}
-	});
+	private static final LinkedList<FileNameCompositor> sPoolList
+		= new LinkedList<FileNameCompositor>();
+//	private static final SimpleInstancePool<FileNameCompositor> sPool
+//		= new SimpleInstancePool<FileNameCompositor>(MAX_POOL_SIZE,
+//				new SimplePoolControl<FileNameCompositor>() {
+//			public FileNameCompositor createInstance(Object...args) {
+//				return new FileNameCompositor();
+//			};
+//			
+//			public void recycleInstance(FileNameCompositor e) {
+//				if (null != e) {
+//					e.empty();
+//				}
+//			}
+//	});
 	
 	private static FileNameCompositor obtainFileNameCompositor() {
-		return sPool.obtain();
+		synchronized (sPoolList) {
+			if (!sPoolList.isEmpty()) {
+				return sPoolList.remove();
+			}
+			return new FileNameCompositor();
+		}
+//		return sPool.obtain();
 	}
 	
 	public static FileNameCompositor obtainFromFileName(String fileName) {
@@ -169,6 +176,12 @@ public class FileNameCompositor {
 	 * 使用对象后，调用该方法是个习惯^_^
 	 */
 	public void recycle() {
-		sPool.recycle(this);
+		empty();
+		synchronized (sPoolList) {
+			if (sPoolList.size() < MAX_POOL_SIZE) {
+				sPoolList.add(this);	
+			}
+		}
+//		sPool.recycle(this);
 	}
 }

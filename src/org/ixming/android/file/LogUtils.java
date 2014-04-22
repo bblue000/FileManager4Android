@@ -2,7 +2,7 @@ package org.ixming.android.file;
 
 import android.util.Log;
 
-public class LogUtils {
+class LogUtils {
 
 	static boolean out_print_info = true;
 	static boolean out_print_warn = true;

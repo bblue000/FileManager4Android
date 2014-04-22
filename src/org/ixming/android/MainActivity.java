@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.ixming.android.file.FileManager;
 import org.ixming.android.file.FileNameCompositor;
 import org.ixming.android.file.R;
-import org.ixming.android.file.R.layout;
-import org.ixming.android.file.R.menu;
 import org.ixming.android.file.StorageType;
 
 import android.os.Bundle;
