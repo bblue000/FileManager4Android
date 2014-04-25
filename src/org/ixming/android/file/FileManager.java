@@ -15,6 +15,23 @@ import android.os.StatFs;
 /**
  * 基础模块之一：文件管理模块
  * 
+ * Android中主要分为两种存储路径：
+ * <ul>
+ * 	<li>/data/data/[packageName]/</li>
+ * 	<li>SD卡</li>
+ * </ul>
+ * 
+ * 相应地，本管理模块中也分别提供了，可以通过以下方式获取：
+ * <ul>
+ * 	<li>{@link FileManager#getDataFileManager()}</li>
+ * 	<li>{@link FileManager#getSDcardFileManager()}</li>
+ * </ul>
+ * 
+ * 一般情况下，应用程序会设置默认的存储方式，所以本模块默认为SD卡。
+ * <br/>
+ * 应用可以通过调用{@link FileManager#initAppConfig(Context, StorageType)}，
+ * 在应用程序的<code>Application</code>初始化时进行设置。
+ * 
  * @author Yin Yong
  */
 public abstract class FileManager {
@@ -88,7 +105,7 @@ public abstract class FileManager {
 	}
 	
 	private Context mContext;
-	protected FileManager(Context context) {
+	/*package*/ FileManager(Context context) {
 		mContext = context;
 	}
 	
@@ -283,6 +300,22 @@ public abstract class FileManager {
 				.equals(Environment.getExternalStorageState());
 	}
 	
+	/**
+	 * 文件夹总大小
+	 * @param path 文件路径（必须为文件夹）
+	 */
+	public static long sizeOfByAndroidStatFs(String path) {
+		StatFs statFs = new StatFs(path);
+		long blockSize = statFs.getBlockSize();
+		long aBlocks = statFs.getBlockCount();
+		long aBlockSum = blockSize * aBlocks;
+		return aBlockSum;
+	}
+	
+	/**
+	 * 文件夹可用空间大小
+	 * @param path 文件路径（必须为文件夹）
+	 */
 	public static long sizeOfFreeByAndroidStatFs(String path) {
 		StatFs statFs = new StatFs(path);
 		long blockSize = statFs.getBlockSize();

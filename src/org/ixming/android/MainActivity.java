@@ -7,6 +7,7 @@ import org.ixming.android.file.FileManager;
 import org.ixming.android.file.FileNameCompositor;
 import org.ixming.android.file.R;
 import org.ixming.android.file.StorageType;
+import org.ixming.io.file.FileUtils;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,48 +23,65 @@ public class MainActivity extends Activity {
 		FileManager.initAppConfig(getApplicationContext(), StorageType.SDCard);
 		
 		Log.d("yytest", "app instance = " + FileManager.getAppFileManager());
-		Log.d("yytest", "" + FileNameCompositor.obtainFromFileName(
-				"yytest.xml").getCompositedFileName());
-		Log.d("yytest", "" + FileNameCompositor.obtainFromDirAndFile(
-				"yytest", "yytest.xml").getCompositedFileName());
-		
-		try {
-			FileManager.getDataFileManager().openFileOutput(
-					FileNameCompositor.obtainFromFileName("yytest.xml"), true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			FileManager.getDataFileManager().openFileOutput(
-					FileNameCompositor.obtainFromDirAndFile("yytest", "yytest.xml"), true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		FileNameCompositor fileNameCompositor = FileNameCompositor
+				.obtainByFileName("yytest.xml");
+		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
+		fileNameCompositor = FileNameCompositor
+				.obtainByUrlWithDir("yytest", "yytest.xml", ".che");
+		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
 		
 		
-
-		try {
-			FileManager.getSDcardFileManager().openFileOutput(
-					FileNameCompositor.obtainFromFileName("yytest.xml"), true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			FileManager.getSDcardFileManager().openFileOutput(
-					FileNameCompositor.obtainFromDirAndFile("yytest", "yytest.xml"), true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fileNameCompositor = FileNameCompositor.obtainRootDir();
+		long size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
+				.getCompositedFile(FileManager.getDataFileManager()).getAbsolutePath());
+		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
+		size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
+				.getCompositedFile(FileManager.getSDcardFileManager()).getAbsolutePath());
+		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
+		
+		size = FileManager.sizeOfFreeByAndroidStatFs("/");
+		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
+		
+//		Log.d("yytest", "" + FileNameCompositor.obtainFromDirAndFile(
+//				"yytest", "yytest.xml").getCompositedFileName());
+//		
+//		try {
+//			FileManager.getDataFileManager().openFileOutput(
+//					FileNameCompositor.obtainFromFileName("yytest.xml"), true);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			FileManager.getDataFileManager().openFileOutput(
+//					FileNameCompositor.obtainFromDirAndFile("yytest", "yytest.xml"), true);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//
+//		try {
+//			FileManager.getSDcardFileManager().openFileOutput(
+//					FileNameCompositor.obtainFromFileName("yytest.xml"), true);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			FileManager.getSDcardFileManager().openFileOutput(
+//					FileNameCompositor.obtainFromDirAndFile("yytest", "yytest.xml"), true);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override

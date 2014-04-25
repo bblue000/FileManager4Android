@@ -1,7 +1,16 @@
 package org.ixming.android.file;
 
+/**
+ * 存储类型
+ * 
+ * @author Yin Yong
+ *
+ */
 public enum StorageType {
 
+	/**
+	 * 存储类型：应用内部文件夹中
+	 */
 	Data {
 		@Override
 		public FileManager getFileManager() {
@@ -9,6 +18,9 @@ public enum StorageType {
 		}
 	},
 	
+	/**
+	 * 存储类型：应用内部文件夹中
+	 */
 	SDCard {
 		@Override
 		public FileManager getFileManager() {
@@ -16,6 +28,10 @@ public enum StorageType {
 		}
 	};
 	
+	/**
+	 * 获得相应的{@link FileManager}
+	 * @return 存储类型相应的{@link FileManager}
+	 */
 	public abstract FileManager getFileManager() ;
 	
 }
