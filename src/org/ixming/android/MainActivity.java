@@ -1,10 +1,7 @@
 package org.ixming.android;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.ixming.android.file.FileManager;
-import org.ixming.android.file.FileNameCompositor;
+import org.ixming.android.file.FileCompositor;
 import org.ixming.android.file.R;
 import org.ixming.android.file.StorageType;
 import org.ixming.io.file.FileUtils;
@@ -22,25 +19,28 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		FileManager.initAppConfig(getApplicationContext(), StorageType.SDCard);
 		
-		Log.d("yytest", "app instance = " + FileManager.getAppFileManager());
-		FileNameCompositor fileNameCompositor = FileNameCompositor
+		
+		FileCompositor fileNameCompositor = FileCompositor
 				.obtainByFileName("yytest.xml");
 		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
-		fileNameCompositor = FileNameCompositor
-				.obtainByUrlWithDir("yytest", "yytest.xml", ".che");
-		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
+		fileNameCompositor.recycle();
+//		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
+		FileCompositor fileNameCompositor1 = FileCompositor.obtainRootDir();
+		Log.d("yytest", "" + (fileNameCompositor == fileNameCompositor1));
+		Log.d("yytest", "" + fileNameCompositor1.getCompositedFileName());
 		
 		
-		fileNameCompositor = FileNameCompositor.obtainRootDir();
+		fileNameCompositor = FileCompositor.obtainRootDir();
 		long size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
-				.getCompositedFile(FileManager.getDataFileManager()).getAbsolutePath());
-		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
-		size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
-				.getCompositedFile(FileManager.getSDcardFileManager()).getAbsolutePath());
+				.getAbsoluteFile(FileManager.getDataFileManager()).getAbsolutePath());
 		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
 		
-		size = FileManager.sizeOfFreeByAndroidStatFs("/");
+		size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
+				.getAbsoluteFile(FileManager.getSDcardFileManager()).getAbsolutePath());
 		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
+		
+//		size = FileManager.sizeOfFreeByAndroidStatFs("/");
+//		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
 		
 //		Log.d("yytest", "" + FileNameCompositor.obtainFromDirAndFile(
 //				"yytest", "yytest.xml").getCompositedFileName());

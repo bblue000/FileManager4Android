@@ -1,11 +1,6 @@
 package org.ixming.android.file;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 import android.content.Context;
@@ -36,8 +31,6 @@ import android.os.StatFs;
  */
 public abstract class FileManager {
 
-	private static final String TAG = FileManager.class.getSimpleName();
-	
 	public static final int FILE_BUFFER_SIZE = 512;
 	
 	private static Context sApplicationContext;
@@ -110,6 +103,23 @@ public abstract class FileManager {
 	}
 	
 	/**
+	 * 获取相应FileManager的根目录地址
+	 */
+	public abstract File getRootDirPath() ;
+	
+	/**
+	 * 获取相应FileManager的Context
+	 */
+	public Context getContext() {
+		return mContext;
+	}
+	
+	/**
+	 * 获取相应FileManager的StorageType
+	 */
+	abstract StorageType getStorageType() ;
+	
+	/**
 	 * 从所有的FileManager中查找，一旦找到返回存储类型
 	 * 
 	 * @param context
@@ -117,130 +127,15 @@ public abstract class FileManager {
 	 * @return null if not exist in all file systems
 	 */
 	public static StorageType existsWithinAllManagers(
-			FileNameCompositor fileNameCompositor) {
+			FileCompositor fileNameCompositor) {
 		StorageType types[] = StorageType.values();
 		for (int i = 0; i < types.length; i++) {
-			FileManager fileManager = types[i].getFileManager();
-			if (fileManager.exists(fileNameCompositor)) {
+			fileNameCompositor.setStorageType(types[i]);
+			if (fileNameCompositor.exists()) {
 				return types[i];
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * 当前FileManager对应的文件中是否存在
-	 */
-	public boolean exists(FileNameCompositor fileNameCompositor) {
-		File file = fileNameCompositor.getCompositedFile(this);
-		return file.exists();
-	}
-	
-	/**
-	 * @param path 不需要根目录地址前缀
-	 * @return path指定的FileInputStream
-	 * 
-	 * @throws FileNotFoundException 如果找不到文件，将抛出该异常/访问权限、异常等
-	 * @throws IOException [其他情况] 如果对应地址为文件夹，将抛出该异常
-	 */
-	public FileInputStream openFileInput(FileNameCompositor file)
-			throws FileNotFoundException, IOException {
-		File src = file.getCompositedFile(this);
-		if (src.exists()) {
-			if (src.isFile()) {
-				return new FileInputStream(src);
-			} else {
-				throw new IOException("file = { " 
-						+ src.getAbsolutePath() + " } is not a file!");
-			}
-		} else {
-			throw new FileNotFoundException("file = { " + src.getAbsolutePath()
-					+ " } is not found!");
-		}
-	}
-	
-	/**
-	 * {@link #openFileOutput(FileNameCompositor, boolean, false)}
-	 * 
-	 * @param file <b>注意：</b>不需要根目录地址前缀
-	 * @param createIfUnExists 如果文件不存在，是否创建
-	 * 
-	 * @return path指定的FileOutputStream
-	 */
-	public FileOutputStream openFileOutput(FileNameCompositor file,
-			boolean createIfUnExists)
-					throws FileNotFoundException, IOException {
-		return openFileOutput(file, createIfUnExists, false);
-	}
-	
-	/**
-	 * @param file <b>注意：</b>不需要根目录地址前缀
-	 * @param createIfUnExists 如果文件不存在，是否创建
-	 * @param append If append is true and the file already exists, 
-	 * it will be appended to; otherwise it will be truncated
-	 * 
-	 * @return path指定的FileOutputStream
-	 * 
-	 * @throws FileNotFoundException 文件不存在且createIfUnExists == false
-	 * @throws IOException 文件创建失败
-	 */
-	public FileOutputStream openFileOutput(FileNameCompositor file,
-			boolean createIfUnExists, boolean append)
-			throws FileNotFoundException, IOException {
-		File src = file.getCompositedFile(this);
-		boolean fileExists = false;
-		if (src.exists()) {
-			fileExists = src.isFile();
-		} else {
-			if (createIfUnExists) {
-				if (!src.exists()) {
-					if (null != src.getParentFile()) {
-						src.getParentFile().mkdirs();
-					}
-					try {
-						src.createNewFile();
-					} catch (IOException e) {
-						throw e;
-					}
-				}
-				fileExists = src.exists();
-			}
-		}
-		if (fileExists) {
-			return new FileOutputStream(src, append);
-		}
-		throw new FileNotFoundException("file = { " + src.getAbsolutePath()
-				+ " } not found!");
-	}
-	
-	/**
-	 * 相当于save(String path, InputStream ins, false)
-	 */
-	public boolean save(FileNameCompositor file, InputStream ins)
-			throws Exception {
-		return save(file, ins, false);
-	}
-	
-	public boolean save(FileNameCompositor file, InputStream ins,
-			boolean append) throws Exception {
-		FileOutputStream out = null;
-		try {
-			out = openFileOutput(file, append);
-			byte[] buf = new byte[FILE_BUFFER_SIZE];
-			int len = -1;
-			while (-1 != (len = ins.read(buf))) {
-				out.write(buf, 0, len);
-			}
-			return true;
-		} catch (Exception e) {
-			LogUtils.e(TAG, "save Exception : " + e.getMessage());
-			throw e;
-		} finally {
-			try {
-				if (null != out)
-					out.close();
-			} catch (Exception ignore) { }
-		}
 	}
 	
 	private static long sLastObtainTime = 0;
@@ -283,15 +178,7 @@ public abstract class FileManager {
 		}
 	}
 	
-	/**
-	 * 获取相应FileManager的根目录地址
-	 */
-	public abstract File getRootDirPath() ;
-	
-	public Context getContext() {
-		return mContext;
-	}
-	
+	// simple utilities, but not recommend frequent use
 	/**
 	 * @return 如果存在SD卡，则返回TRUE
 	 */

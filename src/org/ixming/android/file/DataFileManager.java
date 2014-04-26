@@ -24,4 +24,8 @@ class DataFileManager extends FileManager {
 		return mRootDirPath;
 	}
 
+	@Override
+	StorageType getStorageType() {
+		return StorageType.Data;
+	}
 }
