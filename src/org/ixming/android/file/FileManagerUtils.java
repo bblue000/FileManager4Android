@@ -29,9 +29,16 @@ public class FileManagerUtils {
 	 * @return 如果文件已存在或者被创建成功，返回TRUE，否则返回false。
 	 */
 	public static boolean createFile(File file) throws IOException {
-		if (!exists(file)) {
+		if (exists(file)) {
+			if (file.isDirectory()) {
+				throw new IOException("target path already exists, but is a dir!");
+			}
+			return file.isFile();
+		} else {
 			File parentFile = file.getParentFile();
-			createDir(parentFile);
+			if (null != parentFile) {
+				createDir(parentFile);
+			}
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
@@ -40,11 +47,6 @@ public class FileManagerUtils {
 				throw e;
 			}
 			return exists(file);
-		} else {
-			if (file.isDirectory()) {
-				throw new IOException("target path already exists, but is a dir!");
-			}
-			return file.isFile();
 		}
 	}
 	
@@ -61,7 +63,7 @@ public class FileManagerUtils {
 				throw new IllegalArgumentException("target path = { "
 					+ dir.getAbsolutePath() + " } is a file, not a directory!");
 			}
-			return true;
+			return dir.isDirectory();
 		}
 		dir.mkdirs();
 		return exists(dir);
