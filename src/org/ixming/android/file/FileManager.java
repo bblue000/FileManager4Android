@@ -110,7 +110,7 @@ public abstract class FileManager {
 	/**
 	 * 获取相应FileManager的Context
 	 */
-	public Context getContext() {
+	/*package*/ Context getContext() {
 		return mContext;
 	}
 	

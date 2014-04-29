@@ -23,7 +23,7 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	private static final LinkedList<FileCompositor> sPoolList
 		= new LinkedList<FileCompositor>();
 	
-	private static FileCompositor obtainFileNameCompositor() {
+	private static FileCompositor obtainFileCompositor() {
 		synchronized (sPoolList) {
 			if (!sPoolList.isEmpty()) {
 				return sPoolList.remove().releaseRecycleState();
@@ -36,7 +36,7 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	 * 获得根目录的FileNameCompositor对象
 	 */
 	public static FileCompositor obtainRootDir() {
-		FileCompositor instance = obtainFileNameCompositor();
+		FileCompositor instance = obtainFileCompositor();
 		setParams(instance, null, null);
 		return instance;
 	}
@@ -44,8 +44,8 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	/**
 	 * @param dir 单纯的文件夹名称（两端不需要“/”）
 	 */
-	public static FileCompositor obtainByDir(String dir) {
-		FileCompositor instance = obtainFileNameCompositor();
+	public static FileCompositor obtainDir(String dir) {
+		FileCompositor instance = obtainFileCompositor();
 		checkDirAccuracy(dir);
 		setParams(instance, dir, null);
 		return instance;
@@ -54,8 +54,8 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	/**
 	 * @param fileName 单纯的文件名称（不要含有路径）
 	 */
-	public static FileCompositor obtainByFileName(String fileName) {
-		FileCompositor instance = obtainFileNameCompositor();
+	public static FileCompositor obtainFile(String fileName) {
+		FileCompositor instance = obtainFileCompositor();
 		checkFileNameAccuracy(fileName);
 		setParams(instance, null, fileName);
 		return instance;
@@ -65,9 +65,8 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	 * @param dir 指定文件的父文件夹（两端不需要“/”）
 	 * @param fileName 单纯的文件名称
 	 */
-	public static FileCompositor obtainByDirAndFile(
-			String dir, String fileName) {
-		FileCompositor instance = obtainFileNameCompositor();
+	public static FileCompositor obtainFile(String dir, String fileName) {
+		FileCompositor instance = obtainFileCompositor();
 		checkDirAccuracy(dir);
 		checkFileNameAccuracy(fileName);
 		setParams(instance, dir, fileName);
@@ -207,12 +206,15 @@ public class FileCompositor implements Parcelable, IFileOperations {
 			}
 			return mCompositedPath = sb.toString();
 		}
-		return null;
+		return mCompositedPath;
 	}
 	
 	@Override
 	public String toString() {
-		return "{ path = " + mPath + ", file = " + mFileName + " }";
+		if (isRecycled()) {
+			return "{ recycled instance }";
+		}
+		return "{ path = " + getAbsoluteFile() + " }";
 	}
 	
 	/**
@@ -276,7 +278,7 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	public static final Parcelable.Creator<FileCompositor> CREATOR
 		= new Parcelable.Creator<FileCompositor>() {
 		public FileCompositor createFromParcel(Parcel in) {
-			return FileCompositor.obtainFileNameCompositor().readFromParcel(in);
+			return FileCompositor.obtainFileCompositor().readFromParcel(in);
 		}
 
 		public FileCompositor[] newArray(int size) {

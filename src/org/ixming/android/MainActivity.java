@@ -1,5 +1,9 @@
 package org.ixming.android;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.ixming.android.file.FileManager;
 import org.ixming.android.file.FileCompositor;
 import org.ixming.android.file.R;
@@ -7,6 +11,8 @@ import org.ixming.android.file.StorageType;
 import org.ixming.io.file.FileUtils;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,8 +27,25 @@ public class MainActivity extends Activity {
 		
 		
 		FileCompositor fileNameCompositor = FileCompositor
-				.obtainByFileName("yytest.xml");
+				.obtainFile("yytest.xml");
 		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
+		Log.d("yytest", "before = " + cal(fileNameCompositor.getAbsoluteFile().getAbsolutePath()));
+		OutputStream out;
+		try {
+			out = fileNameCompositor.openFileOutput(true);
+			out.write("1234".getBytes());
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedOperationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Log.d("yytest", "after = " + cal(fileNameCompositor.getAbsoluteFile().getAbsolutePath()));
+		
+		
+		
 		fileNameCompositor.recycle();
 //		Log.d("yytest", "" + fileNameCompositor.getCompositedFileName());
 		FileCompositor fileNameCompositor1 = FileCompositor.obtainRootDir();
@@ -38,6 +61,9 @@ public class MainActivity extends Activity {
 		size = FileManager.sizeOfFreeByAndroidStatFs(fileNameCompositor
 				.getAbsoluteFile(FileManager.getSDcardFileManager()).getAbsolutePath());
 		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
+		
+		
+		
 		
 //		size = FileManager.sizeOfFreeByAndroidStatFs("/");
 //		Log.d("yytest", "" + FileUtils.calFileSizeString(size));
@@ -82,6 +108,13 @@ public class MainActivity extends Activity {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+	}
+	
+	private String cal(String path) {
+		StatFs statFs = new StatFs(path);
+		statFs.getBlockSize();
+		return FileUtils.calFileSizeString(statFs.getBlockCount()
+				* statFs.getBlockSize());
 	}
 
 	@Override
