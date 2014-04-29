@@ -55,12 +55,12 @@ public class FileManagerUtils {
 	 * 
 	 * @return 如果文件夹已存在或者被创建成功，返回TRUE，否则返回false。
 	 * 
-	 * @throws IllegalArgumentException 特别地，如果指定的路径是一个已存在的文件，将抛出异常
+	 * @throws IOException 特别地，如果指定的路径是一个已存在的文件，将抛出异常
 	 */
-	public static boolean createDir(File dir) throws IllegalArgumentException {
+	public static boolean createDir(File dir) throws IOException {
 		if (exists(dir)) {
 			if (dir.isFile()) {
-				throw new IllegalArgumentException("target path = { "
+				throw new IOException("target path = { "
 					+ dir.getAbsolutePath() + " } is a file, not a directory!");
 			}
 			return dir.isDirectory();
@@ -198,7 +198,7 @@ public class FileManagerUtils {
 			throws FileNotFoundException, UnsupportedOperationException, IOException {
 		FileOutputStream out = null;
 		try {
-			out = openFileOutput(file, append);
+			out = openFileOutput(file, true, append);
 			byte[] buf = new byte[FileManager.FILE_BUFFER_SIZE];
 			int len = -1;
 			while (-1 != (len = ins.read(buf))) {

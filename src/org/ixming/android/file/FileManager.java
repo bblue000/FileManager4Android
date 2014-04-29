@@ -123,19 +123,24 @@ public abstract class FileManager {
 	 * 从所有的FileManager中查找，一旦找到返回存储类型
 	 * 
 	 * @param context
-	 * @param fileNameCompositor
+	 * @param fileCompositor
 	 * @return null if not exist in all file systems
 	 */
 	public static StorageType existsWithinAllManagers(
-			FileCompositor fileNameCompositor) {
-		StorageType types[] = StorageType.values();
-		for (int i = 0; i < types.length; i++) {
-			fileNameCompositor.setStorageType(types[i]);
-			if (fileNameCompositor.exists()) {
-				return types[i];
+			FileCompositor fileCompositor) {
+		final StorageType originalType = fileCompositor.getStorageType();
+		try {
+			StorageType types[] = StorageType.values();
+			for (int i = 0; i < types.length; i++) {
+				fileCompositor.setStorageType(types[i]);
+				if (fileCompositor.exists()) {
+					return types[i];
+				}
 			}
+			return null;
+		} finally {
+			fileCompositor.setStorageType(originalType);
 		}
-		return null;
 	}
 	
 	private static long sLastObtainTime = 0;

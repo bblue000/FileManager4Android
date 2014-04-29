@@ -31,14 +31,14 @@ interface IFileOperations {
 	 * 
 	 * @return 如果最终文件夹存在，返回TRUE；否则返回false
 	 */
-	boolean mkdirs() throws IllegalArgumentException ;
+	boolean mkdirs() throws IOException ;
 	
 	/**
 	 * 创建 {@link FileCompositor} 指定的文件的所有父文件夹
 	 * 
 	 * @return 如果最终父文件存在，返回TRUE；否则返回false
 	 */
-	boolean mkParentDirs() throws IllegalArgumentException;
+	boolean mkParentDirs() throws IOException;
 	
 	/**
 	 * 删除 {@link FileCompositor} 指定的文件（夹）
@@ -127,4 +127,9 @@ interface IFileOperations {
 	 */
 	boolean save(InputStream ins, boolean append, boolean closeIns)
 			throws FileNotFoundException, UnsupportedOperationException, IOException ;
+	
+	/**
+	 * 获得文件（夹）的大小
+	 */
+	long size();
 }

@@ -135,18 +135,25 @@ public class FileCompositor implements Parcelable, IFileOperations {
 		return this;
 	}
 	
+	public StorageType getStorageType() {
+		checkIfRecycled();
+		return mStorageType;
+	}
+	
 	/**
 	 * 设置当前 {@code FileCompositor} 的父文件夹
 	 */
-	/*package*/ void setPath(String path) {
+	/*package*/ FileCompositor setPath(String path) {
 		mPath = path;
+		return this;
 	}
 	
 	/**
 	 * 设置当前 {@code FileCompositor} 的文件名
 	 */
-	/*package*/ void setFileName(String fileName) {
+	/*package*/ FileCompositor setFileName(String fileName) {
 		mFileName = fileName;
+		return this;
 	}
 	
 	/**
@@ -307,12 +314,12 @@ public class FileCompositor implements Parcelable, IFileOperations {
 	}
 
 	@Override
-	public boolean mkdirs() throws IllegalArgumentException {
+	public boolean mkdirs() throws IOException {
 		return FileManagerUtils.createDir(getAbsoluteFile());
 	}
 
 	@Override
-	public boolean mkParentDirs() throws IllegalArgumentException {
+	public boolean mkParentDirs() throws IOException {
 		File myFile = getAbsoluteFile();
 		File parentFile = myFile.getParentFile();
 		if (null == parentFile) {
@@ -364,6 +371,11 @@ public class FileCompositor implements Parcelable, IFileOperations {
 			boolean closeIns) throws FileNotFoundException,
 			UnsupportedOperationException, IOException {
 		return FileManagerUtils.save(getAbsoluteFile(), ins, append, closeIns);
+	}
+
+	@Override
+	public long size() {
+		return FileManagerUtils.caculateFileSize(getAbsoluteFile());
 	}
 	
 }
